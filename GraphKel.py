@@ -56,28 +56,30 @@ def nx_to_grakel(graph):
     node_labels= {node: graph.nodes[node].get("label", str(node)) for node in graph.nodes()}
     return Graph(edges, node_labels=node_labels)
 
+
+
 # grakel_graphs= [nx_to_grakel(g) for g in graphs.values()]
 # graph_names= list(graphs.keys())
 
 math_grakel_graphs= [nx_to_grakel(g) for g in graphs_math.values()]
 
-wl_kernel_math = WeisfeilerLehman(n_iter=3, base_graph_kernel=VertexHistogram, normalize=True)
+wl_kernel_math = WeisfeilerLehman(n_iter=10, base_graph_kernel=VertexHistogram, normalize=True)
 sim_math = wl_kernel_math.fit_transform(math_grakel_graphs)
 print("WL graph_kel")
 print("ground truth with ground truth",sim_math[0,0])
-print("ground truth with var1",sim_math[0,1])
-print("ground truth with var2",sim_math[0,2])
-print("ground truth with var3",sim_math[0,3])
-print("ground truth with var4",sim_math[0,4],"\n")
+print("ground truth with var1: {:.2f}".format(sim_math[0,1]))
+print("ground truth with var2: {:.2f}".format(sim_math[0,2]))
+print("ground truth with var3: {:.2f}".format(sim_math[0,3]))
+print("ground truth with var4: {:.2f}\n".format(sim_math[0,4]))
 
-odd_kernel_math = OddSth(h=3, normalize=True)
+odd_kernel_math = OddSth(h=10, normalize=True)
 sim_math = odd_kernel_math.fit_transform(math_grakel_graphs)
 print("OddSth graph_kel")
 print("ground truth with ground truth",sim_math[0,0])
-print("ground truth with var1",sim_math[0,1])
-print("ground truth with var2",sim_math[0,2])
-print("ground truth with var3",sim_math[0,3])
-print("ground truth with var4",sim_math[0,4])
+print("ground truth with var1: {:.2f}".format(sim_math[0,1]))
+print("ground truth with var2: {:.2f}".format(sim_math[0,2]))
+print("ground truth with var3: {:.2f}".format(sim_math[0,3]))
+print("ground truth with var4: {:.2f}".format(sim_math[0,4]))
 
 
 # wl_kernel = WeisfeilerLehman(n_iter=3, base_graph_kernel=VertexHistogram, normalize=True)
