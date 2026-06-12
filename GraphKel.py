@@ -5,6 +5,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 from OptimModelGraphs import graphs_math
+import finaloptimgraphing
+
 
 
 # # graphkeL format requires each graph to be a tuple of (edge_list, node_labels)
@@ -101,4 +103,46 @@ print("ground truth with var4: {:.2f}".format(sim_math[0,4]))
 # why different similarity score?
 # the wl in graphkel only considers undirected graphs (so outgoing edges)
 
+from finaloptimgraphing import graphs, bipartite_graphs
 
+
+grakel_graphs = [nx_to_grakel(g) for g in graphs.values()]
+graph_names = list(graphs.keys())
+
+bipartite_grakel_graphs = [nx_to_grakel(g) for g in bipartite_graphs.values()]
+
+-
+wl_kernel = WeisfeilerLehman(n_iter=10, base_graph_kernel=VertexHistogram, normalize=True)
+sim = wl_kernel.fit_transform(grakel_graphs)
+
+print("WL Kernel: Model Graphs")
+print(f"ground truth with ground truth: {sim[0,0]:.2f}")
+for i in range(1, len(graph_names)):
+    print(f"ground truth with {graph_names[i]}: {sim[0,i]:.2f}")
+
+
+odd_kernel = OddSth(h=10, normalize=True)
+sim_odd = odd_kernel.fit_transform(grakel_graphs)
+
+print("\nOddSth Kernel: Model Graphs")
+print(f"ground truth with ground truth: {sim_odd[0,0]:.2f}")
+for i in range(1, len(graph_names)):
+    print(f"ground truth with {graph_names[i]}: {sim_odd[0,i]:.2f}")
+
+
+wl_kernel_bi = WeisfeilerLehman(n_iter=10, base_graph_kernel=VertexHistogram, normalize=True)
+sim_bi = wl_kernel_bi.fit_transform(bipartite_grakel_graphs)
+
+print("\n WL Kernel: Bipartite Graphs")
+print(f"ground truth with ground truth: {sim_bi[0,0]:.2f}")
+for i in range(1, len(graph_names)):
+    print(f"ground truth with {graph_names[i]}: {sim_bi[0,i]:.2f}")
+
+
+odd_kernel_bi = OddSth(h=10, normalize=True)
+sim_odd_bi = odd_kernel_bi.fit_transform(bipartite_grakel_graphs)
+
+print("\nOddSth Kernel: Bipartite Graphs")
+print(f"ground truth with ground truth: {sim_odd_bi[0,0]:.2f}")
+for i in range(1, len(graph_names)):
+    print(f"ground truth with {graph_names[i]}: {sim_odd_bi[0,i]:.2f}")
