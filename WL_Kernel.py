@@ -14,7 +14,7 @@ def wl_relabel(G, label_dict, label_counter, iteration):
             
             neighbor_labels = sorted(
                 [label_dict[G][n] for n in G.predecessors(node)] +
-                [label_dict[G][n] for n in G.successors(node)] # to suit the DAG
+                [label_dict[G][n] for n in G.successors(node)]
             )
             
             signature = f"iter{iteration}_{current_label}_{'_'.join(map(str, neighbor_labels))}"

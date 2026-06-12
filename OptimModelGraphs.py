@@ -1,3 +1,4 @@
+
 import sympy as sp
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -67,22 +68,6 @@ models= {
     "Variant4":variant4
 }
 
-def canonicalize_variables(model):
-    variables=set()
-    var_map={}
-
-    variables |= model["objective"].free_symbols
-    for c in model["constraints"]:
-        #print(c)
-        variables |= c.free_symbols
-    
-    variables = sorted(list(variables), key=lambda x: str(x)) 
-
-    var_map = {v: f"var{i+1}" for i, v in enumerate(variables)}
-    #print(var_map)
-    return var_map
-
-
 def canonical_constraint(constraint):
     expr= constraint.lhs - constraint.rhs
     return sp.expand(expr)
@@ -102,13 +87,12 @@ def build_model_graph(model,name):
     
     G= nx.DiGraph()
     G.add_node("MODEL",type="model")
-    
+
     variables= extract_variables(model)
 
     # add the variable nodes
-    variable_normalized_naming=canonicalize_variables(model)
     for v in variables:
-        G.add_node(variable_normalized_naming[v],type="variable")
+        G.add_node(str(v),type="variable")
 
     # add the objective node
     G.add_node("OBJECTIVE", type="objective")
@@ -117,31 +101,31 @@ def build_model_graph(model,name):
     obj_expr= sp.expand(model["objective"])
 
     for v in variables:
-        coef= float(obj_expr.coeff(variable_normalized_naming[v]))
-        coef_node= f"obj_coef_{variable_normalized_naming[v]}"
+        coef= float(obj_expr.coeff(v))
+        coef_node= f"obj_coef_{v}"
 
         G.add_node(coef_node,value=coef)
 
-        G.add_edge(coef_node,variable_normalized_naming[v])
-        G.add_edge(variable_normalized_naming[v], "OBJECTIVE")
+        G.add_edge(coef_node,str(v))
+        G.add_edge(str(v), "OBJECTIVE")
 
     #add the constraints
     for i, c in enumerate(model["constraints"]):
         cname= f"C{i+1}"
-        #print(cname)
+
         G.add_node(cname,type="constraint")
         G.add_edge(cname,"MODEL")
 
         expr= canonical_constraint(c)
 
         for v in variables:
-            coef= float(expr.coeff(variable_normalized_naming[v]))
-            coef_node= f"{cname}_coef_{variable_normalized_naming[v]}"
-            
+            coef= float(expr.coeff(v))
+            coef_node= f"{cname}_coef_{v}"
+
             G.add_node(coef_node,value=coef)
 
-            G.add_edge(coef_node,variable_normalized_naming[v])
-            G.add_edge(variable_normalized_naming[v],cname)
+            G.add_edge(coef_node,str(v))
+            G.add_edge(str(v),cname)
 
         constant= float(expr.subs({v:0 for v in variables}))
         const_node= f"{cname}_const"
@@ -152,13 +136,10 @@ def build_model_graph(model,name):
 
     return G
 
-
-
 graphs_math={}
 
 for name,model in models.items():
     graphs_math[name]= build_model_graph(model,name)
-
 
 
 
